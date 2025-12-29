@@ -26,9 +26,17 @@ def get_model_dir(model_name):
 # def get_model_dir_folder(folder_name,model_name):
 #     return os.path.join( f'/home/rmapkay/rl-starter-files-RGB/rl-starter-files/storage/{folder_name}', model_name)
 
-def get_model_dir_folder(folder_name,model_name):
-    model_dir = os.path.join("/scratch/rmapkay", folder_name, model_name)  # Construct the full path
-    os.makedirs(model_dir, exist_ok=True)
+def get_model_dir_folder(folder_name, model_name):
+    storage_dir = "storage"
+    
+    if not os.path.exists(storage_dir):
+        os.makedirs(storage_dir)
+
+    if folder_name:
+        model_dir = os.path.join(storage_dir, folder_name, model_name)
+    else:
+        model_dir = os.path.join(storage_dir, model_name)
+        
     return model_dir
    
 

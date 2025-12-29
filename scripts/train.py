@@ -56,6 +56,10 @@ parser.add_argument("--frames-per-proc", type=int, default=None,
                     help="number of frames per process before update (default: 5 for A2C and 128 for PPO)")
 parser.add_argument("--discount", type=float, default=0.99,
                     help="discount factor (default: 0.99)")
+parser.add_argument("--dynamic-gamma", action="store_true", default=False,
+                    help="Enable dynamic growth of the discount factor upon finding the first reward.")
+parser.add_argument("--gamma-step", type=float, default=0.00002,
+                    help="Linear increment step added to the discount factor per update after the first reward is found.")
 parser.add_argument("--lr", type=float, default=0.0001,
                     help="learning rate (default: 0.001)") #I changed it to 0.0001 bcz it was the best with ICM
 parser.add_argument("--gae-lambda", type=float, default=0.95,
@@ -237,7 +241,8 @@ def main():
     elif args.algo=="ppo_state_count":
         algo= torch_ac.PPOAlgoStateCount(envs, acmodel, device, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
                                 args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,
-                                args.optim_eps, args.clip_eps, args.epochs, args.batch_size,args.singleton_env, args.RGB, preprocess_obss,args.ir_coef)
+                                args.optim_eps, args.clip_eps, args.epochs, args.batch_size,args.singleton_env, args.RGB, preprocess_obss,
+                                args.ir_coef, dynamic_gamma=args.dynamic_gamma, gamma_step=args.gamma_step)
     elif args.algo=="ppo_entropy":
         algo= torch_ac.PPOAlgoEntropy(envs, acmodel, device, args.frames_per_proc, args.discount, args.lr, args.gae_lambda,
                                 args.entropy_coef, args.value_loss_coef, args.max_grad_norm, args.recurrence,

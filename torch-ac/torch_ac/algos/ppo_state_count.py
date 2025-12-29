@@ -10,7 +10,7 @@ class PPOAlgoStateCount(PPOAlgo):
     def __init__(self, envs, acmodel, device=None, num_frames_per_proc=None, discount=0.99, lr=0.001, gae_lambda=0.95,
                  entropy_coef=0.01, value_loss_coef=0.5, max_grad_norm=0.5, recurrence=4,
                  adam_eps=1e-8, clip_eps=0.2, epochs=4, batch_size=256,singleton_env=False, RGB=False, preprocess_obss=None,intrinsic_reward_coeff=0.0001,
-                 reshape_reward=None): 
+                 reshape_reward=None, dynamic_gamma=False, gamma_step=0.00002): 
        
         super().__init__(envs, acmodel, device, num_frames_per_proc, discount, lr, gae_lambda,
                  entropy_coef, value_loss_coef, max_grad_norm, recurrence,
@@ -26,6 +26,17 @@ class PPOAlgoStateCount(PPOAlgo):
         self.intrinsic_rewards=torch.zeros(*shape, device=self.device)
         self.log_episode_return_int = torch.zeros(self.num_procs, device=self.device)
         self.log_return_int =  [0] * self.num_procs
+
+        #Dynamic gamma configuration
+        self.use_dynamic_gamma = dynamic_gamma
+        self.gamma_step = gamma_step
+        self.target_discount = 0.999
+        self.found_reward = False
+
+        if self.use_dynamic_gamma:
+            self.discount = 0.99
+        else:
+            self.discount = discount
         
     def pass_models_parameters(self):
         return self.train_state_count
@@ -92,7 +103,6 @@ class PPOAlgoStateCount(PPOAlgo):
                 obs_tuple=tuple( obs[p]['image'].reshape(-1).tolist())
                 temp_irewards[p]=self.intrinsic_reward_coeff /np.sqrt(self.train_state_count[obs_tuple])
                 
-            print ('Training time: {:.1f} seconds'.format(time.time() - start_time))
             self.intrinsic_rewards[i]=temp_irewards.clone().detach()
             self.intrinsic_reward_per_frame=(torch.mean(self.intrinsic_rewards[i])).item()
             done = tuple(a | b for a, b in zip(terminated, truncated))
@@ -152,6 +162,8 @@ class PPOAlgoStateCount(PPOAlgo):
             self.log_episode_return_int *= self.mask
 
         # Add advantage and return to experiences
+
+        self.memorize()
 
         preprocessed_obs = self.preprocess_obss(self.obs, device=self.device)
         with torch.no_grad():
@@ -235,3 +247,14 @@ class PPOAlgoStateCount(PPOAlgo):
 
         return exps, logs, self.frames 
     
+    def memorize(self):
+        #if dynamic mode
+        if self.use_dynamic_gamma and self.found_reward:
+            #increase gamma
+            self.discount += self.gamma_step
+
+            #Clamping
+            if self.discount > self.target_discount:
+                self.discount = self.target_discount
+            else:   
+                print(f"[DYNAMIC GAMMA] Update! {self.discount:.5f} (Target: {self.target_discount})")
