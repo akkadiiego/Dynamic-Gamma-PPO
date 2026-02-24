@@ -30,13 +30,8 @@ class PPOAlgoStateCount(PPOAlgo):
         #Dynamic gamma configuration
         self.use_dynamic_gamma = dynamic_gamma
         self.gamma_step = gamma_step
-        self.target_discount = 0.999
+        self.target_discount = 0.995
         self.found_reward = False
-
-        if self.use_dynamic_gamma:
-            self.discount = 0.99
-        else:
-            self.discount = discount
         
     def pass_models_parameters(self):
         return self.train_state_count
