@@ -3,7 +3,7 @@ To run the experiments:
 1. Create an environment with the python version 3.9
 
 	conda create --name env python=3.9
-
+	conda activate env
 2. install the dependencies from requirements.txt
 
 	pip install -r requirements.txt
