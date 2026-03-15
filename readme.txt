@@ -6,7 +6,7 @@ To run the experiments:
 
 2. install the dependencies from requirements.txt
 
-	pip install -r requirements
+	pip install -r requirements.txt
 
 3. Set the python path in the root of the directory
 
@@ -22,7 +22,6 @@ Example:
 		Baseline: /scripts/train.py --algo ppo_state_count --env MiniGrid-Empty-16x16-v0 --model Baseline_Empty16_S1 --seed 1 --frames 40000000 --gpu 0 --lr 0.0001 --entropy-coef 0.0005 --discount 0.99
 
 		Dynamic: /scripts/train.py --algo ppo_state_count --env MiniGrid-Empty-16x16-v0 --model Dynamic_Empty16_S1 --seed 1 --frames 40000000 --gpu 0 --lr 0.0001 --entropy-coef 0.0005 --discount 0.985 --dynamic-gamma --gamma-step 0.00002 -discount-target 0.995
-
 
 The dynamic includes 3 more arguments: 
 
