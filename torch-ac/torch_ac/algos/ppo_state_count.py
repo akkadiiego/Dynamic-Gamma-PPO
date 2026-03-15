@@ -10,7 +10,7 @@ class PPOAlgoStateCount(PPOAlgo):
     def __init__(self, envs, acmodel, device=None, num_frames_per_proc=None, discount=0.99, lr=0.001, gae_lambda=0.95,
                  entropy_coef=0.01, value_loss_coef=0.5, max_grad_norm=0.5, recurrence=4,
                  adam_eps=1e-8, clip_eps=0.2, epochs=4, batch_size=256,singleton_env=False, RGB=False, preprocess_obss=None,intrinsic_reward_coeff=0.0001,
-                 reshape_reward=None, dynamic_gamma=False, gamma_step=0.00002): 
+                 reshape_reward=None, dynamic_gamma=False, gamma_step=0.00002, target_discount=0.995): 
        
         super().__init__(envs, acmodel, device, num_frames_per_proc, discount, lr, gae_lambda,
                  entropy_coef, value_loss_coef, max_grad_norm, recurrence,
@@ -30,7 +30,7 @@ class PPOAlgoStateCount(PPOAlgo):
         #Dynamic gamma configuration
         self.use_dynamic_gamma = dynamic_gamma
         self.gamma_step = gamma_step
-        self.target_discount = 0.995
+        self.target_discount = target_discount
         self.found_reward = False
         
     def pass_models_parameters(self):
