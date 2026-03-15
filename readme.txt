@@ -4,6 +4,7 @@ To run the experiments:
 
 	conda create --name env python=3.9
 	conda activate env
+
 2. install the dependencies from requirements.txt
 
 	pip install -r requirements.txt
